@@ -1,0 +1,217 @@
+<meta charset="utf-8">
+<style>
+    *
+    {
+        padding : 0;
+        margin : 0;
+    }
+
+    table
+    {
+        border-collapse : collapse;
+    }
+
+    textarea
+    {
+        overflow : scroll;
+        resize : none;
+        white-space: pre;
+    }
+</style>
+<table>
+    <tbody>
+        <tr>
+            <td colspan="2">
+                <textarea id="OldText" placeholder="Old text" spellcheck="false" style="width:49vw;height:45vh"></textarea>
+            </td>
+            <td colspan="2">
+                <textarea id="NewText" placeholder="New text" spellcheck="false" style="width:49vw;height:45vh"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input id="OldTextSeparator" type="text" placeholder="Old text separator" value="µ" style="width:24.5vw;height:2.5vh"/>
+            </td>
+            <td>
+                <input id="PhraseSeparator" type="text" placeholder="Phrase separator" value="\n---\n" style="width:24.5vw;height:2.5vh"/>
+            </td>
+            <td>
+                <input id="NewTextFormat" type="text" placeholder="New text format" value="µ{{old}}¨fr:{{new}}µ" style="width:24.5vw;height:2.5vh"/>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea id="OldTranslation" placeholder="Old translation" spellcheck="false" style="width:49vw;height:45vh"></textarea>
+            </td>
+            <td colspan="2">
+                <textarea id="NewTranslation" placeholder="New translation" spellcheck="false" style="width:49vw;height:45vh"></textarea>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<button onclick="ExtractTranslations()" style="font-size:1.5vw">Extract</button>
+<button onclick="ReplaceTranslations()" style="font-size:1.5vw">Replace</button>
+<input id="Synchronization" type="checkbox" name="Synchronization" style="font-size:1.5vw"/>
+<label for="Synchronization">Synchronization</label>
+<script>
+    // -- FUNCTIONS
+
+    function GetProcessedText(
+        text
+        )
+    {
+        return text.split( "\\n" ).join( "\n" );
+    }
+
+    // ~~
+
+    function ExtractTranslations(
+        )
+    {
+        var
+            old_text,
+            old_text_separator,
+            old_translation,
+            old_translation_array,
+            part_array,
+            part_index,
+            phrase_separator;
+
+        old_text = document.getElementById( "OldText" ).value;
+        old_text_separator = document.getElementById( "OldTextSeparator" ).value;
+        phrase_separator = GetProcessedText( document.getElementById( "PhraseSeparator" ).value );
+
+        old_translation_array = [];
+        part_array = old_text.split( old_text_separator );
+
+        for ( part_index = 1;
+              part_index < part_array.length;
+              part_index += 2 )
+        {
+            old_translation_array.push( part_array[ part_index ] );
+        }
+
+        old_translation = old_translation_array.join( phrase_separator );
+
+        document.getElementById( "OldTranslation" ).value = old_translation;
+    }
+
+    // ~~
+
+    function ReplaceTranslations(
+        )
+    {
+        var
+            new_text,
+            new_text_format,
+            new_translation,
+            new_translation_array,
+            old_text,
+            old_text_separator,
+            old_translation,
+            old_translation_array,
+            part,
+            part_array,
+            part_index,
+            phrase_separator,
+            translation_index;
+
+        old_text = document.getElementById( "OldText" ).value;
+        old_text_separator = GetProcessedText( document.getElementById( "OldTextSeparator" ).value );
+        phrase_separator = GetProcessedText( document.getElementById( "PhraseSeparator" ).value );
+        new_text_format = GetProcessedText( document.getElementById( "NewTextFormat" ).value );
+        old_translation = document.getElementById( "OldTranslation" ).value;
+        new_translation = document.getElementById( "NewTranslation" ).value;
+
+        old_translation_array = old_translation.split( phrase_separator );
+        new_translation_array = new_translation.split( phrase_separator );
+
+        translation_index = 0;
+        part_array = old_text.split( old_text_separator );
+
+        for ( part_index = 1;
+              part_index < part_array.length;
+              part_index += 2 )
+        {
+            old_translation = old_translation_array[ translation_index ];
+            new_translation = new_translation_array[ translation_index ];
+
+            part = part_array[ part_index ];
+
+            if ( part === old_translation )
+            {
+                part_array[ part_index ]
+                    = new_text_format.split( "{{old}}" ).join( part ).split( "{{new}}" ).join( new_translation );
+            }
+            else
+            {
+                part_array[ part_index ]
+                    = new_text_format.split( "{{old}}" ).join( part ).split( "{{new}}" ).join( "*** ERROR ***" );;
+            }
+
+            ++translation_index;
+        }
+
+        new_text = part_array.join( "" );
+
+        document.getElementById( "NewText" ).value = new_text;
+    }
+
+    // -- STATEMENTS
+
+    document.getElementById( "OldText" ).addEventListener(
+        "scroll",
+        function (
+            event
+            )
+        {
+            if ( document.getElementById( "Synchronization" ).checked )
+            {
+                document.getElementById( "NewText" ).scrollTop = event.currentTarget.scrollTop;
+            }
+        }
+        );
+
+    document.getElementById( "NewText" ).addEventListener(
+        "scroll",
+        function (
+            event
+            )
+        {
+            if ( document.getElementById( "Synchronization" ).checked )
+            {
+                document.getElementById( "OldText" ).scrollTop = event.currentTarget.scrollTop;
+            }
+        }
+        );
+
+    document.getElementById( "OldTranslation" ).addEventListener(
+        "scroll",
+        function (
+            event
+            )
+        {
+            if ( document.getElementById( "Synchronization" ).checked )
+            {
+                document.getElementById( "NewTranslation" ).scrollTop = event.currentTarget.scrollTop;
+            }
+        }
+        );
+
+    document.getElementById( "NewTranslation" ).addEventListener(
+        "scroll",
+        function (
+            event
+            )
+        {
+            if ( document.getElementById( "Synchronization" ).checked )
+            {
+                document.getElementById( "OldTranslation" ).scrollTop = event.currentTarget.scrollTop;
+            }
+        }
+        );
+
+    document.getElementById( "OldText" ).click();
+</script>
