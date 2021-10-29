@@ -33,7 +33,7 @@
                 <input id="OldTextSeparator" type="text" placeholder="Old text separator" value="µ" style="width:24.5vw;height:2.5vh"/>
             </td>
             <td>
-                <input id="PhraseSeparator" type="text" placeholder="Phrase separator" value="\n---\n" style="width:24.5vw;height:2.5vh"/>
+                <input id="PhraseSeparator" type="text" placeholder="Phrase separator" value="¶---¶" style="width:24.5vw;height:2.5vh"/>
             </td>
             <td>
                 <input id="NewTextFormat" type="text" placeholder="New text format" value="µ{{old}}¨fr:{{new}}µ" style="width:24.5vw;height:2.5vh"/>
@@ -62,7 +62,7 @@
         text
         )
     {
-        return text.split( "\\n" ).join( "\n" );
+        return text.split( "¶" ).join( "\n" );
     }
 
     // ~~
