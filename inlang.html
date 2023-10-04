@@ -29,12 +29,12 @@
     <input id="old-text-separator" type="text" placeholder="Old text separator" value="µ" style="grid-area: 2 / 1 / span 1 / span 1"/>
     <input id="translation-separator" type="text" placeholder="Phrase separator" value="¶---¶" style="grid-area: 2 / 2 / span 1 / span 1"/>
     <input id="new-text-format" type="text" placeholder="New text format" value="{{old}}¨fr:{{new}}" style="grid-area: 2 / 3 / span 1 / span 2"/>
-    <textarea id="old-translation" placeholder="Old translation" spellcheck="false" style="grid-area: 3 / 1 / span 1 / span 2"></textarea>
-    <textarea id="new-translation" placeholder="New translation" spellcheck="false" style="grid-area: 3 / 3 / span 1 / span 2"></textarea>
+    <textarea id="old-translation-text" placeholder="Old translation text" spellcheck="false" style="grid-area: 3 / 1 / span 1 / span 2"></textarea>
+    <textarea id="new-translation-text" placeholder="New translation text" spellcheck="false" style="grid-area: 3 / 3 / span 1 / span 2"></textarea>
     <div style="grid-area: 4 / 1 / span 1 / span 4">
-        <button onclick="ExtractTranslations()" style="font-size:1.5vw">Extract</button>
-        <button onclick="ReplaceTranslations()" style="font-size:1.5vw">Replace</button>
-        <input id="synchronized-scrolling" type="checkbox" name="synchronized-scrolling" checked style="font-size:1.5vw"/>
+        <button onclick="ExtractTranslations()">Extract</button>
+        <button onclick="ReplaceTranslations()">Replace</button>
+        <input id="synchronized-scrolling" type="checkbox" name="synchronized-scrolling" checked/>
         <label for="synchronized-scrolling">Synchronized Scrolling</label>
     </div>
 </div>
@@ -58,6 +58,7 @@
             old_text_separator,
             old_translation,
             old_translation_array,
+            old_translation_text_element,
             part_array,
             part_index,
             translation_separator;
@@ -78,7 +79,11 @@
 
         old_translation = old_translation_array.join( translation_separator );
 
-        document.getElementById( "old-translation" ).value = old_translation;
+        old_translation_text_element = document.getElementById( "old-translation-text" );
+        old_translation_text_element.value = old_translation;
+        old_translation_text_element.focus();
+        old_translation_text_element.setSelectionRange( 0, old_translation.length );
+        document.execCommand( "copy" );
     }
 
     // ~~
@@ -91,10 +96,12 @@
             new_text_format,
             new_translation,
             new_translation_array,
+            new_translation_text,
             old_text,
             old_text_separator,
             old_translation,
             old_translation_array,
+            old_translation_text,
             part,
             part_array,
             part_index,
@@ -105,11 +112,11 @@
         old_text_separator = GetProcessedText( document.getElementById( "old-text-separator" ).value );
         translation_separator = GetProcessedText( document.getElementById( "translation-separator" ).value );
         new_text_format = GetProcessedText( document.getElementById( "new-text-format" ).value );
-        old_translation = document.getElementById( "old-translation" ).value;
-        new_translation = document.getElementById( "new-translation" ).value;
+        old_translation_text = document.getElementById( "old-translation-text" ).value;
+        new_translation_text = document.getElementById( "new-translation-text" ).value;
 
-        old_translation_array = old_translation.split( translation_separator );
-        new_translation_array = new_translation.split( translation_separator );
+        old_translation_array = old_translation_text.split( translation_separator );
+        new_translation_array = new_translation_text.split( translation_separator );
 
         translation_index = 0;
         part_array = old_text.split( old_text_separator );
@@ -139,7 +146,11 @@
 
         new_text = part_array.join( "" );
 
-        document.getElementById( "new-text" ).value = new_text;
+        new_text_element = document.getElementById( "new-text" );
+        new_text_element.value = new_text;
+        new_text_element.focus();
+        new_text_element.setSelectionRange( 0, new_text.length );
+        document.execCommand( "copy" );
     }
 
     // -- STATEMENTS
@@ -170,7 +181,7 @@
         }
         );
 
-    document.getElementById( "old-translation" ).addEventListener(
+    document.getElementById( "old-translation-text" ).addEventListener(
         "scroll",
         function (
             event
@@ -178,12 +189,12 @@
         {
             if ( document.getElementById( "synchronized-scrolling" ).checked )
             {
-                document.getElementById( "new-translation" ).scrollTop = event.currentTarget.scrollTop;
+                document.getElementById( "new-translation-text" ).scrollTop = event.currentTarget.scrollTop;
             }
         }
         );
 
-    document.getElementById( "new-translation" ).addEventListener(
+    document.getElementById( "new-translation-text" ).addEventListener(
         "scroll",
         function (
             event
@@ -191,7 +202,7 @@
         {
             if ( document.getElementById( "synchronized-scrolling" ).checked )
             {
-                document.getElementById( "old-translation" ).scrollTop = event.currentTarget.scrollTop;
+                document.getElementById( "old-translation-text" ).scrollTop = event.currentTarget.scrollTop;
             }
         }
         );

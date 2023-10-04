@@ -4,6 +4,8 @@
 
 Translation extractor and integrator.
 
+![](https://github.com/senselogic/INLANG/blob/master/SCREENSHOT/screenshot.png)
+
 ## Version
 
 1.0
